@@ -38,23 +38,26 @@ let _setTestHeaders = (r) => {
   r.setRequestHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 };
 let request = function() {
+  document.getElementById('resultTable').innerHTML = '<span>Loading...</span>';
   _xhr.open('GET', 'http://validate.jsontest.com/?json={"key":"value"}', false);
   _setTestHeaders(_xhr);
   _xhr.send();
   switch(_xhr.status){
     case 200:
       console.table( JSON.parse(_xhr.responseText) );
+      document.getElementById('resultTable').innerHTML = '<span>Table should be rebuilt.</span>';
       //...
       break;
     default:// as error handler
       console.log( _xhr.status + ': ' + _xhr.statusText );
+      document.getElementById('resultTable').innerHTML = '<span>Failed.</span>';
       break;
   };
   return false;
 };
 
 // POLLING WITH PROMISE. Read more: https://davidwalsh.name/javascript-polling
-let _polling = (fn, timeout=2100, interval=800) => {
+let _polling = (fn, timeout=3100, interval=1000) => {
   let endTime = Number(new Date()) + timeout;
   let checkConditions = function(resolve, reject) {
     // if the condition is met, we're done!
@@ -82,5 +85,6 @@ let POLLING_CALL = (controlElementId) => {
       console.log(`Fail: ${err}`);
       let checkbox = document.getElementById(controlElementId);
       checkbox.checked = false;
+    document.getElementById('resultTable').innerHTML = '<span>Cleared.</span>';
     });
 };
