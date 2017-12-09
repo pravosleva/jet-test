@@ -29,6 +29,7 @@ table { width: 100% }
   -ms-transition: background .5s, color .5s ease-in-out;
   -o-transition: background .5s, color .5s ease-in-out;
   transition: background .5s, color .5s ease-in-out;
-  padding: 5px;
   border-radius: 4px;
+  padding: 10px 10px;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, .4);
 }
