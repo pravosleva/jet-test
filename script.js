@@ -2,7 +2,10 @@ document.addEventListener('DOMContentLoaded', function(){ // Аналог $(docu
   let controlElementId = 'timeOutEnabled';
   let checkbox = document.getElementById(controlElementId);
   let _actionByCheckBoxChange = (checked) => {
-    startPollingByConditions(() => {return (checkbox.checked);});
+    startPollingByConditions({
+      toBeOrNotToBe: () => { return (checkbox.checked) },
+      url: 'http://localhost:1111/jetsArray'
+    });
   };
   // need to set the handler to checkbox:
   checkbox.onchange = function() { _actionByCheckBoxChange(checkbox.checked) };
@@ -24,7 +27,8 @@ function _delay (ms=3000) {
   });
 }
 
-function startPollingByConditions (toBeOrNotToBe, url='http://validate.jsontest.com/?json={"key":"value"}') {
+function startPollingByConditions (arg) {
+  let { toBeOrNotToBe, url='http://validate.jsontest.com/?json={"key":"value"}' } = arg;
   if (toBeOrNotToBe ()) {
     document.getElementById('resultTable').innerHTML = '<span>Loading...</span>';
     myAsyncRequest(url)
@@ -34,7 +38,7 @@ function startPollingByConditions (toBeOrNotToBe, url='http://validate.jsontest.
         document.getElementById('resultTable').innerHTML = '<span>Table updated.</span>';
         // next polling session...
         _delay()
-          .then(() => { startPollingByConditions (toBeOrNotToBe, url); })
+          .then(() => { startPollingByConditions ({ toBeOrNotToBe, url }); })
           .catch((err) => { console.log(`startPollingByConditions () was not called: ${err}`); });
       })
       .catch((err) => {
@@ -43,7 +47,7 @@ function startPollingByConditions (toBeOrNotToBe, url='http://validate.jsontest.
         document.getElementById('resultTable').innerHTML = '<span>Error: ' + err + '</span>';
         // next polling session...
         _delay()
-          .then(() => { startPollingByConditions (toBeOrNotToBe, url); })
+          .then(() => { startPollingByConditions ({ toBeOrNotToBe, url }); })
           .catch((err) => { console.log(`startPollingByConditions () was not called: ${err}`); });
       });
   } else {
