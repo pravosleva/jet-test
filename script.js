@@ -35,7 +35,10 @@ function startPollingByConditions (arg) {
       .then((data) => {
         // do smthn with data...
         console.table(data);
-        document.getElementById('resultTable').innerHTML = '<span>Table updated.</span>';
+        document.getElementById('resultTable').innerHTML = _getTableHTML(data);
+        document.getElementById('resultTable').style.background = '#374c6b';
+        document.getElementById('resultTable').style.color = 'white';
+        document.getElementById('reportTime').innerHTML = new Date();
         // next polling session...
         _delay()
           .then(() => { startPollingByConditions ({ toBeOrNotToBe, url }); })
@@ -45,6 +48,8 @@ function startPollingByConditions (arg) {
         // err handler
         console.error(err);
         document.getElementById('resultTable').innerHTML = '<span>Error: ' + err + '</span>';
+        document.getElementById('resultTable').style.background = 'red';
+        document.getElementById('resultTable').style.color = 'white';
         // next polling session...
         _delay()
           .then(() => { startPollingByConditions ({ toBeOrNotToBe, url }); })
@@ -53,5 +58,43 @@ function startPollingByConditions (arg) {
   } else {
     console.log(`myAsyncRequest () was not called. Check the conditions...`);
     document.getElementById('resultTable').innerHTML = '<span>Polling switched off.</span>';
+    document.getElementById('resultTable').style.background = 'yellow';
+    document.getElementById('resultTable').style.color = 'black';
   }
+}
+
+// fn to detect the distance between two points
+let getDistanceBetween2PointsOnSphere = (coordinatesObj1, coordinatesObj2, r=6371) => {
+  let { lat: lat1, lon: lon1 } = coordinatesObj1,
+    { lat: lat2, lon: lon2 } = coordinatesObj2,
+    pi = Math.PI;
+  // need to convert to radians:
+  lat1 = lat1*pi/180;
+  lat2 = lat2*pi/180;
+  lon1 = lon1*pi/180;
+  lon2 = lon2*pi/180;
+  return (
+    r * Math.acos( Math.sin(lat1)*Math.sin(lat2) + Math.cos(lat1)*Math.cos(lat2)*Math.cos(lon1-lon2) )
+  );
+}
+
+function _getTableHTML(jetsArray) {
+  let html = '<table><thead>';
+  html += "<tr><th>Flight Number</th><th>Coordinates</th><th>Distance to Airport</th></tr>";
+  html += '</thead>';
+  html += '<tbody>';
+
+  for (jetNum in jetsArray) {
+    html += "<tr>" +
+      "<td>" + jetsArray[jetNum].flightNumber + "</td>" +
+      "<td>" + JSON.stringify(jetsArray[jetNum].coordinates) + "</td>" +
+      "<td>" + getDistanceBetween2PointsOnSphere(
+        { lat: 55.410307, lon: 37.902451 },
+        { lat: jetsArray[jetNum].coordinates.lat, lon: jetsArray[jetNum].coordinates.lon }
+      ).toFixed(2) + "</td>" +
+    "</tr>";
+  };
+
+  html += '</tbody></table>';
+  return html;
 }

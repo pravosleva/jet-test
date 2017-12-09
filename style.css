@@ -22,4 +22,11 @@ body { margin: 0; }
   grid-row-end: 4;
 }
 
-/*#resultTable {}*/
+table { width: 100% }
+#resultTable {
+  -webkit-transition: background .5s, color .5s ease-in-out;
+  -moz-transition: background .5s, color .5s ease-in-out;
+  -ms-transition: background .5s, color .5s ease-in-out;
+  -o-transition: background .5s, color .5s ease-in-out;
+  transition: background .5s, color .5s ease-in-out;
+}
