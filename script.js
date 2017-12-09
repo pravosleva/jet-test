@@ -1,66 +1,104 @@
-document.addEventListener('DOMContentLoaded', function(){ // Аналог $(document).ready(function(){
-  let controlElementId = 'timeOutEnabled';
-  let checkbox = document.getElementById(controlElementId);
-  let _actionByCheckBoxChange = (checked) => {
-    startPollingByConditions({
-      toBeOrNotToBe: () => { return (checkbox.checked) },
-      url: 'http://localhost:1111/jetsArray'
+function onCheckBoxChange (checkBox) {
+  if (checkBox.checked) { // Запускаем поллинг, только если галочка нажата
+    var flag = true;  // Флаг уйдёт в замыкание, его будет возвращать toBeOrNotToBe
+    /*
+      В handler будет функция которая будет добавлена в обработчики события "change"
+      чекбокса. Когда галочка будет снята, она поменяет flag на false и уберёт себя
+      из обработчиков события.
+    */
+    var handler = function(event) {
+      if (!checkBox.checked) { /* на самом деле эта проверка не
+                                  нужна, потому что мы знаем, что
+                                  checkBox.checked было true,
+                                  когда добавляли обработчик,
+                                  значит теперь оно может быть
+                                  только false. */
+        flag = false;
+        checkBox.removeEventListener('change', handler);
+        document.getElementById('resultTable').innerHTML = '<span>Polling switched off.</span>';
+        document.getElementById('resultTable').style.background = 'yellow';
+        document.getElementById('resultTable').style.color = 'black';
+      }
+    };
+    checkBox.addEventListener ("change", handler);
+    startPolling ({
+      url: 'http://selection4test.ru:1111/jetsArray',
+      toBeOrNotToBe: () => { return (flag); },
+      interval: 3000
     });
-  };
-  // need to set the handler to checkbox:
-  checkbox.onchange = function() { _actionByCheckBoxChange(checkbox.checked) };
-});
+  }
+}
 
-let myAsyncRequest = (url) => {
+/*
+  Это XMLHttpRequest завёрнутый в промис, прямо с сайта Mozilla.
+  myAsyncRequest возвращает промис.
+*/
+function myAsyncRequest (url) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", url);
-    xhr.onload = () => resolve(JSON.parse(xhr.responseText));// JSON should be received by server!
-    xhr.onerror = () => reject(`Error of the myAsyncRequest (): ${xhr.statusText || 'xhr.statusText is nothing'}`);
+    xhr.onload = () => resolve(JSON.parse(xhr.responseText));
+    xhr.onerror = () => reject(xhr.statusText);
     xhr.send();
   });
 }
 
-function _delay (ms=3000) {
-  return new Promise((res, rej) => {
-    if (true) { setTimeout(res, ms); } else { rej(); }
+/*
+  Это setTimeout завёрнутый в промис.
+  myTimeoutPromise возвращает промис.
+*/
+function myTimeoutPromise (ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(function(){resolve();}, ms);
   });
 }
 
-function startPollingByConditions (arg) {
-  let { toBeOrNotToBe, url='http://validate.jsontest.com/?json={"key":"value"}' } = arg;
-  if (toBeOrNotToBe ()) {
-    document.getElementById('resultTable').innerHTML = '<span>Loading...</span>';
-    myAsyncRequest(url)
-      .then((data) => {
-        // do smthn with data...
-        console.table(data);
-        document.getElementById('resultTable').innerHTML = _getTableHTML(data);
+/*
+  Эта функция запускает поллинг по адресу url с интервалом interval в мс, и
+  остановится только тогда, когда toBeOrNotToBe вернёт false.
+  В случае успешного запроса она выводит его в консоль (а надо бы, наверное,
+  передать ещё один параметр - коллбэк, которому передавался бы результат
+  успешного запроса).
+*/
+function startPolling (arg) {
+  let { url, toBeOrNotToBe, interval } = arg;
+  console.log ("startPolling ()", url, toBeOrNotToBe(), interval);
+  if (toBeOrNotToBe()) {
+    myAsyncRequest (url)
+      .then (function (result){ // Запрос прошёл успешно
+        console.table(result);
+        document.getElementById('resultTable').innerHTML = _getTableHTML(result);
         document.getElementById('resultTable').style.background = '#374c6b';
         document.getElementById('resultTable').style.color = 'white';
         document.getElementById('reportTime').innerHTML = new Date();
-        // next polling session...
-        _delay()
-          .then(() => { startPollingByConditions ({ toBeOrNotToBe, url }); })
-          .catch((err) => { console.log(`startPollingByConditions () was not called: ${err}`); });
+        return (myTimeoutPromise (interval));
       })
-      .catch((err) => {
-        // err handler
-        console.error(err);
+      .then (function (){ // Таймаут сработал
+        startPolling ({ url, toBeOrNotToBe, interval });
+      })
+      .catch (function (err) {
+        /* Ошибка могла возникнуть только у XMLHttpRequest, так как
+        у setTimeout ошибок не бывает. Ошибка XMLHttpRequest означает
+        проблемы с сетью или с сервером, но поллинг можно продолжить,
+        если считать, что проблемы временные. */
+        console.log ("An error occured.");
         document.getElementById('resultTable').innerHTML = '<span>Error: ' + err + '</span>';
         document.getElementById('resultTable').style.background = 'red';
         document.getElementById('resultTable').style.color = 'white';
-        // next polling session...
-        _delay()
-          .then(() => { startPollingByConditions ({ toBeOrNotToBe, url }); })
-          .catch((err) => { console.log(`startPollingByConditions () was not called: ${err}`); });
+        // Поллинг продолжается.
+        startPolling ({ url, toBeOrNotToBe, interval });
       });
-  } else {
-    console.log(`myAsyncRequest () was not called. Check the conditions...`);
-    document.getElementById('resultTable').innerHTML = '<span>Polling switched off.</span>';
-    document.getElementById('resultTable').style.background = 'yellow';
-    document.getElementById('resultTable').style.color = 'black';
   }
+}
+
+/*
+  Это setTimeout завёрнутый в промис.
+  myTimeoutPromise возвращает промис.
+*/
+function myTimeoutPromise (ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(function(){resolve();}, ms);
+  });
 }
 
 // fn to detect the distance between two points

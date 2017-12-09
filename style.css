@@ -1,4 +1,4 @@
-body { margin: 0; }
+body { font-family: Sans-Serif; }
 .container {
   display: grid;
   grid-template-columns: auto minmax(300px, 1000px) auto;
@@ -29,4 +29,6 @@ table { width: 100% }
   -ms-transition: background .5s, color .5s ease-in-out;
   -o-transition: background .5s, color .5s ease-in-out;
   transition: background .5s, color .5s ease-in-out;
+  padding: 5px;
+  border-radius: 4px;
 }

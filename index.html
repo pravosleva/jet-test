@@ -17,16 +17,16 @@
     <div class="block-1">
       <h2>Block 1</h2>
       <p>
-        <input type="checkbox" id="timeOutEnabled" title="Polling call control element" />
-        <br />
-        <span>See console. Default delay setting = 3000 ms.</span>
+        <input type="checkbox" onchange="onCheckBoxChange(this)" id="timeOutEnabled" title="Polling call control element">
+        <code>See console. Default delay setting = 3000 ms.</code>
+        </input>
       </p>
     </div>
 
     <div class="block-2">
       <h2>Block 2</h2>
       <p>
-        <span>Last update: <span id='reportTime'></span></span>
+        <code>Last update: <span id='reportTime'></span></code>
         <div id='resultTable'></div>
       </p>
     </div>
