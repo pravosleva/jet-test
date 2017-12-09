@@ -79,6 +79,19 @@ let getDistanceBetween2PointsOnSphere = (coordinatesObj1, coordinatesObj2, r=637
 }
 
 function _getTableHTML(jetsArray) {
+  // need to sort jets by distance
+  let airportCoordinates = { lat: 55.410307, lon: 37.902451 };
+  // each element of jets arr should have his current distance as prop which name will be distanceToAirport
+  jetsArray.forEach(function callback(element, index, array) {
+    // your iterator should be there
+    element.distanceToAirport = getDistanceBetween2PointsOnSphere(airportCoordinates, { lat: element.coordinates.lat, lon: element.coordinates.lon });
+  });
+  // new variable is unnessesary
+  jetsArray.sort((element1, element2) => {
+    return element1.distanceToAirport - element2.distanceToAirport
+  });
+  // so, jets array was sorted by compare function which was received as argument...
+
   let html = '<table><thead>';
   html += "<tr><th>Flight Number</th><th>Coordinates</th><th>Distance to Airport</th></tr>";
   html += '</thead>';
@@ -88,10 +101,7 @@ function _getTableHTML(jetsArray) {
     html += "<tr>" +
       "<td>" + jetsArray[jetNum].flightNumber + "</td>" +
       "<td>" + JSON.stringify(jetsArray[jetNum].coordinates) + "</td>" +
-      "<td>" + getDistanceBetween2PointsOnSphere(
-        { lat: 55.410307, lon: 37.902451 },
-        { lat: jetsArray[jetNum].coordinates.lat, lon: jetsArray[jetNum].coordinates.lon }
-      ).toFixed(2) + "</td>" +
+      "<td>" + jetsArray[jetNum].distanceToAirport.toFixed(2) + "</td>" +
     "</tr>";
   };
 
