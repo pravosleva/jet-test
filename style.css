@@ -1,3 +1,4 @@
+body { margin: 0; }
 .container {
   display: grid;
   grid-template-columns: auto minmax(300px, 1000px) auto;
@@ -20,3 +21,5 @@
   grid-row-start: 3;
   grid-row-end: 4;
 }
+
+/*#resultTable {}*/

@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', function(){ // Аналог $(document).ready(function(){
   let controlElementId = 'timeOutEnabled';
   let checkbox = document.getElementById(controlElementId);
-  let _actionByCheckBox = (checked) => {
+  let _actionByCheckBoxChange = (checked) => {
     startPollingByConditions(() => {return (checkbox.checked);});
   };
   // need to set the handler to checkbox:
-  checkbox.onchange = function() { _actionByCheckBox(checkbox.checked) };
+  checkbox.onchange = function() { _actionByCheckBoxChange(checkbox.checked) };
 });
 
 let myAsyncRequest = (url) => {
@@ -13,56 +13,41 @@ let myAsyncRequest = (url) => {
     const xhr = new XMLHttpRequest();
     xhr.open("GET", url);
     xhr.onload = () => resolve(JSON.parse(xhr.responseText));// JSON should be received by server!
-    xhr.onerror = () => reject(xhr.statusText);
+    xhr.onerror = () => reject(`Error of the myAsyncRequest (): ${xhr.statusText || 'xhr.statusText is nothing'}`);
     xhr.send();
   });
 }
 
-
-/*
-myAsyncRequest('http://validate.jsontest.com/?json={"key":"value"}')
-  .then((data) => {
-    console.table(data);
-  })
-  .catch((err) => {
-    console.err(err);
+function _delay (ms=3000) {
+  return new Promise((res, rej) => {
+    if (true) { setTimeout(res, ms); } else { rej(); }
   });
-*/
-
-/*
-function startPollingByConditions (toBeOrNotToBe, url = 'http://validate.jsontest.com/?json={"key":"value"}', interval = 3000) {
-  if (toBeOrNotToBe ()) {
-    setTimeout (() => {
-      myAsyncRequest(url)
-        .then((data) => {
-          console.table(data);
-          startPollingByConditions (toBeOrNotToBe, url, interval);
-        })
-        .catch((err) => {
-          console.error(err);
-          startPollingByConditions (toBeOrNotToBe, url, interval);
-        });
-    }, interval);
-  }
 }
-*/
 
-function startPollingByConditions (toBeOrNotToBe, url = 'http://validate.jsontest.com/?json={"key":"value"}', interval = 3000) {
+function startPollingByConditions (toBeOrNotToBe, url='http://validate.jsontest.com/?json={"key":"value"}') {
   if (toBeOrNotToBe ()) {
+    document.getElementById('resultTable').innerHTML = '<span>Loading...</span>';
     myAsyncRequest(url)
       .then((data) => {
+        // do smthn with data...
         console.table(data);
-        setTimeout (() => {
-          startPollingByConditions (toBeOrNotToBe, url, interval);
-        }, interval);
+        document.getElementById('resultTable').innerHTML = '<span>Table updated.</span>';
+        // next polling session...
+        _delay()
+          .then(() => { startPollingByConditions (toBeOrNotToBe, url); })
+          .catch((err) => { console.log(`startPollingByConditions () was not called: ${err}`); });
       })
       .catch((err) => {
+        // err handler
         console.error(err);
-        setTimeout (() => {
-          startPollingByConditions (toBeOrNotToBe, url, interval);
-        }, interval);
+        document.getElementById('resultTable').innerHTML = '<span>Error: ' + err + '</span>';
+        // next polling session...
+        _delay()
+          .then(() => { startPollingByConditions (toBeOrNotToBe, url); })
+          .catch((err) => { console.log(`startPollingByConditions () was not called: ${err}`); });
       });
+  } else {
+    console.log(`myAsyncRequest () was not called. Check the conditions...`);
+    document.getElementById('resultTable').innerHTML = '<span>Polling switched off.</span>';
   }
 }
-
-//startPollingByConditions ();
