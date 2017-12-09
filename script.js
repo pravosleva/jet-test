@@ -72,12 +72,6 @@ function startPollingByConditions (arg) {
   } else { }
 }
 
-function myTimeoutPromise (ms) {
-  return new Promise((resolve, reject) => {
-    setTimeout(function(){resolve();}, ms);
-  });
-}
-
 // fn to detect the distance between two points
 let getDistanceBetween2PointsOnSphere = (coordinatesObj1, coordinatesObj2, r=6371) => {
   let { lat: lat1, lon: lon1 } = coordinatesObj1,
