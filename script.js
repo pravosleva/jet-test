@@ -1,18 +1,8 @@
 function onCheckBoxChange (checkBox) {
-  if (checkBox.checked) { // Запускаем поллинг, только если галочка нажата
-    var flag = true;  // Флаг уйдёт в замыкание, его будет возвращать toBeOrNotToBe
-    /*
-      В handler будет функция которая будет добавлена в обработчики события "change"
-      чекбокса. Когда галочка будет снята, она поменяет flag на false и уберёт себя
-      из обработчиков события.
-    */
+  if (checkBox.checked) {
+    var flag = true;
     var handler = function(event) {
-      if (!checkBox.checked) { /* на самом деле эта проверка не
-                                  нужна, потому что мы знаем, что
-                                  checkBox.checked было true,
-                                  когда добавляли обработчик,
-                                  значит теперь оно может быть
-                                  только false. */
+      if (!checkBox.checked) {
         flag = false;
         checkBox.removeEventListener('change', handler);
         document.getElementById('resultTable').innerHTML = '<span>Polling switched off.</span>';
@@ -29,10 +19,6 @@ function onCheckBoxChange (checkBox) {
   }
 }
 
-/*
-  Это XMLHttpRequest завёрнутый в промис, прямо с сайта Mozilla.
-  myAsyncRequest возвращает промис.
-*/
 function myAsyncRequest (url) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -43,29 +29,18 @@ function myAsyncRequest (url) {
   });
 }
 
-/*
-  Это setTimeout завёрнутый в промис.
-  myTimeoutPromise возвращает промис.
-*/
 function myTimeoutPromise (ms) {
   return new Promise((resolve, reject) => {
     setTimeout(function(){resolve();}, ms);
   });
 }
 
-/*
-  Эта функция запускает поллинг по адресу url с интервалом interval в мс, и
-  остановится только тогда, когда toBeOrNotToBe вернёт false.
-  В случае успешного запроса она выводит его в консоль (а надо бы, наверное,
-  передать ещё один параметр - коллбэк, которому передавался бы результат
-  успешного запроса).
-*/
 function startPolling (arg) {
   let { url, toBeOrNotToBe, interval } = arg;
   console.log ("startPolling ()", url, toBeOrNotToBe(), interval);
   if (toBeOrNotToBe()) {
     myAsyncRequest (url)
-      .then (function (result){ // Запрос прошёл успешно
+      .then (function (result){
         console.table(result);
         document.getElementById('resultTable').innerHTML = _getTableHTML(result);
         document.getElementById('resultTable').style.background = '#374c6b';
@@ -73,28 +48,19 @@ function startPolling (arg) {
         document.getElementById('reportTime').innerHTML = new Date();
         return (myTimeoutPromise (interval));
       })
-      .then (function (){ // Таймаут сработал
+      .then (function (){
         startPolling ({ url, toBeOrNotToBe, interval });
       })
       .catch (function (err) {
-        /* Ошибка могла возникнуть только у XMLHttpRequest, так как
-        у setTimeout ошибок не бывает. Ошибка XMLHttpRequest означает
-        проблемы с сетью или с сервером, но поллинг можно продолжить,
-        если считать, что проблемы временные. */
         console.log ("An error occured.");
         document.getElementById('resultTable').innerHTML = '<span>Error: ' + err + '</span>';
         document.getElementById('resultTable').style.background = 'red';
         document.getElementById('resultTable').style.color = 'white';
-        // Поллинг продолжается.
         startPolling ({ url, toBeOrNotToBe, interval });
       });
   }
 }
 
-/*
-  Это setTimeout завёрнутый в промис.
-  myTimeoutPromise возвращает промис.
-*/
 function myTimeoutPromise (ms) {
   return new Promise((resolve, reject) => {
     setTimeout(function(){resolve();}, ms);
