@@ -1,28 +1,34 @@
+let _setCustomResult = (arg) => {
+  let { msg, bgColor='#D1B37D', color='black' } = arg;
+  document.getElementById('resultTable').innerHTML = '<strong>' + msg + '</strong>';
+  document.getElementById('resultTable').style.background = bgColor;
+  document.getElementById('resultTable').style.color = color;
+};
+
 function onCheckBoxChange (checkBox) {
+  let callbackAsResolve = (jetsArr) => {
+    console.table(jetsArr);
+    document.getElementById('resultTable').innerHTML = _getTableHTML(jetsArr);
+    document.getElementById('resultTable').style.background = '#69ADA4';//#748CB5
+    document.getElementById('resultTable').style.color = 'white';
+    document.getElementById('reportTime').innerHTML = new Date();
+  },
+  callbackAsReject = (err) => {
+    //console.error(err);
+    document.getElementById('resultTable').innerHTML = '<strong>Error: ' + (err || 'Trying to reconnect...') + '</strong>';
+    document.getElementById('resultTable').style.background = '#ee5f5b';
+    document.getElementById('resultTable').style.color = 'white';
+  };
   if (checkBox.checked) {
     var switched_ON = true;
+    _setCustomResult({ msg: 'Connection...' });
     var handlerForCheckBox = (event) => {
-        if (!checkBox.checked) {
-          switched_ON = false;
-          checkBox.removeEventListener('change', handlerForCheckBox);
-          document.getElementById('resultTable').innerHTML = '<span>Polling switched off.</span>';
-          document.getElementById('resultTable').style.background = 'yellow';
-          document.getElementById('resultTable').style.color = 'black';
-        } else { /* nothing */ }
-      },
-      callbackAsResolve = (jetsArr) => {
-        console.table(jetsArr);
-        document.getElementById('resultTable').innerHTML = _getTableHTML(jetsArr);
-        document.getElementById('resultTable').style.background = '#374c6b';
-        document.getElementById('resultTable').style.color = 'white';
-        document.getElementById('reportTime').innerHTML = new Date();
-      },
-      callbackAsReject = (err) => {
-        console.error(err);
-        document.getElementById('resultTable').innerHTML = '<span>Error: ' + err + '</span>';
-        document.getElementById('resultTable').style.background = 'red';
-        document.getElementById('resultTable').style.color = 'white';
-      };
+      if (!checkBox.checked) {
+        switched_ON = false;
+        _setCustomResult({ msg: 'Polling switched off...' });
+        checkBox.removeEventListener('change', handlerForCheckBox);
+      } else { /* nothing */ }
+    };
     checkBox.addEventListener ("change", handlerForCheckBox);
     startPollingByConditions ({
       url: 'http://selection4test.ru:1111/jetsArray',
@@ -31,7 +37,7 @@ function onCheckBoxChange (checkBox) {
       callbackAsResolve,
       callbackAsReject
     });
-  }
+  } else { _setCustomResult({ msg: 'Polling switched off...' }); };
 }
 
 function myAsyncRequest (url) {
@@ -53,23 +59,30 @@ function myTimeoutPromise (ms) {
 function startPollingByConditions (arg) {
   let { url, toBeOrNotToBe, interval, callbackAsResolve, callbackAsReject } = arg;
   console.log ("startPollingByConditions ()", url, toBeOrNotToBe(), interval);
+  _setCustomResult({ msg: 'Loading...' });
   if (toBeOrNotToBe()) {
     myAsyncRequest (url)
-      .then (function (result){
-        console.log (`startPollingByConditions () is done.`);
-        callbackAsResolve(result);
-        return (myTimeoutPromise (interval));
-      })
+      .then (
+        function (result){
+          console.log (`startPollingByConditions () is done.`);
+          callbackAsResolve(result);
+          return (myTimeoutPromise (interval));
+        },
+        function(){
+          callbackAsReject(`startPollingByConditions () is failed: Trying to reconnect...`);
+          return (myTimeoutPromise (interval));
+        }
+      )
       .then (function (){
         console.log (`startPollingByConditions () was called again...`);
         startPollingByConditions ({ url, toBeOrNotToBe, interval, callbackAsResolve, callbackAsReject });
       })
       .catch (function (err) {
-        console.log (`startPollingByConditions () is failed: ${err}`);
-        callbackAsReject(err);
-        startPollingByConditions ({ url, toBeOrNotToBe, interval, callbackAsResolve, callbackAsReject });
+        console.log (`startPollingByConditions () is failed! Nothing else.`);
+        //callbackAsReject(`startPollingByConditions () is failed: Trying to reconnect...`);
+        //startPollingByConditions ({ url, toBeOrNotToBe, interval, callbackAsResolve, callbackAsReject });
       });
-  } else { }
+  } else { _setCustomResult({ msg: 'Aborted by setting' }); }
 }
 
 // fn to detect the distance between two points
@@ -109,7 +122,7 @@ function _getTableHTML(jetsArray) {
   for (jetNum in jetsArray) {
     html += "<tr>" +
       "<td>" + jetsArray[jetNum].flightNumber + "</td>" +
-      "<td>" + JSON.stringify(jetsArray[jetNum].coordinates) + "</td>" +
+      "<td>" + jetsArray[jetNum].coordinates.lat + ", " + jetsArray[jetNum].coordinates.lon + "</td>" +
       "<td>" + jetsArray[jetNum].distanceToAirport.toFixed(2) + "</td>" +
     "</tr>";
   };
