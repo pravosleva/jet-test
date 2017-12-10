@@ -16,17 +16,20 @@
 
     <div class="block-1">
       <h2>Input</h2>
-      <p>
-        <input type="checkbox" onchange="onCheckBoxChange(this)" id="timeOutEnabled" title="Polling call control element" />
-        <code>Polling switcher. Default delay setting = 3000 ms.</code>
-      </p>
+      <p><pre>Default delay setting = 3000 ms.</pre></p>
+      <section>
+        <div class="slideThree">
+          <input type="checkbox" onchange="onCheckBoxChange(this)" id="slideThree" value="None" name="check" />
+          <label for="slideThree"></label>
+        </div>
+      </section>
     </div>
 
     <div class="block-2">
       <h2>Output</h2>
       <p>
         <code>Last update: <span id='reportTime'></span></code>
-        <div id='resultTable'>Data was not received yet.</div>
+        <div id='resultTable'><em>Data was not received yet...</em></div>
       </p>
     </div>
 

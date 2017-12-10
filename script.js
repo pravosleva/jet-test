@@ -25,7 +25,7 @@ function onCheckBoxChange (checkBox) {
     var handlerForCheckBox = (event) => {
       if (!checkBox.checked) {
         switched_ON = false;
-        _setCustomResult({ msg: 'Polling switched off...' });
+        _setCustomResult({ msg: 'Polling switched off...', bgColor: '#69ADA4', color: 'white' });
         checkBox.removeEventListener('change', handlerForCheckBox);
       } else { /* nothing */ }
     };
@@ -37,7 +37,7 @@ function onCheckBoxChange (checkBox) {
       callbackAsResolve,
       callbackAsReject
     });
-  } else { _setCustomResult({ msg: 'Polling switched off...' }); };
+  } else { _setCustomResult({ msg: 'Polling switched off...', bgColor: '#69ADA4', color: 'white' }); };
 }
 
 function myAsyncRequest (url) {
@@ -82,7 +82,7 @@ function startPollingByConditions (arg) {
         //callbackAsReject(`startPollingByConditions () is failed: Trying to reconnect...`);
         //startPollingByConditions ({ url, toBeOrNotToBe, interval, callbackAsResolve, callbackAsReject });
       });
-  } else { _setCustomResult({ msg: 'Aborted by setting' }); }
+  } else { _setCustomResult({ msg: 'Polling stopped.' }); }
 }
 
 // fn to detect the distance between two points
