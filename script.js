@@ -7,7 +7,7 @@ let _setCustomResult = (arg) => {
 
 function onCheckBoxChange (checkBox) {
   let callbackAsResolve = (jetsArr) => {
-    console.table(jetsArr);
+    //console.table(jetsArr);
     document.getElementById('resultTable').innerHTML = _getTableHTML(jetsArr);
     document.getElementById('resultTable').style.background = '#69ADA4';//#748CB5
     document.getElementById('resultTable').style.color = 'white';
@@ -31,7 +31,10 @@ function onCheckBoxChange (checkBox) {
     };
     checkBox.addEventListener ("change", handlerForCheckBox);
     startPollingByConditions ({
-      url: 'http://selection4test.ru:1111/jetsArray',
+      url: 'https://data-live.flightradar24.com/zones/fcgi/feed.js?bounds=56.84,55.27,33.48,41.48',
+      /* response example:
+        {"full_count":9550,"version":4,"fcc280c":["424599",55.7655,34.3593,257,34000,436,"1541","F-UUWW2","A320","VQ-BSL",1512972705,"SVO","BUD","SU2032",0,64,"AFL2032",0]
+      */
       toBeOrNotToBe: () => switched_ON,
       interval: 3000,
       callbackAsResolve,
@@ -86,7 +89,7 @@ function startPollingByConditions (arg) {
 }
 
 // fn to detect the distance between two points
-let getDistanceBetween2PointsOnSphere = (coordinatesObj1, coordinatesObj2, r=6371) => {
+let getDistanceBetween2PointsOnSphere = (coordinatesObj1, coordinatesObj2, r=6371, h=4000) => {
   let { lat: lat1, lon: lon1 } = coordinatesObj1,
     { lat: lat2, lon: lon2 } = coordinatesObj2,
     pi = Math.PI;
@@ -100,33 +103,63 @@ let getDistanceBetween2PointsOnSphere = (coordinatesObj1, coordinatesObj2, r=637
   );
 }
 
-function _getTableHTML(jetsArray) {
+function _getTableHTML(jetsObj) {
+  /*
+    TODO:
+    [ ] height should be sent as last arg to getDistanceBetween2PointsOnSphere ()
+      what is the height in original response?
+    [ ] coordinates: [1], [2]
+    [ ] speed, km/h
+      is received or need to calc?
+    [ ] vector, grad
+      wtf?
+    [ ] height, m
+    [ ] airport codes: [11], [12]
+      is correct?
+    [ ] flight number
+      what is the flight num in response?
+  */
   // need to sort jets by distance
   let airportCoordinates = { lat: 55.410307, lon: 37.902451 };
-  // each element of jets arr should have his current distance as prop which name will be distanceToAirport
-  jetsArray.forEach(function callback(element, index, array) {
-    // your iterator should be there
-    element.distanceToAirport = getDistanceBetween2PointsOnSphere(airportCoordinates, { lat: element.coordinates.lat, lon: element.coordinates.lon });
-  });
-  // new variable is unnessesary
-  jetsArray.sort((element1, element2) => {
-    return element1.distanceToAirport - element2.distanceToAirport
-  });
-  // so, jets array was sorted by compare function which was received as argument...
+  let jetsOnly = [];
+  for(propName in jetsObj){
+    if (jetsObj[propName] instanceof Array) {
+      //console.log(jetsObj[propName]);
+      jetsObj[propName].push( getDistanceBetween2PointsOnSphere(
+        airportCoordinates,
+        { lat: jetsObj[propName][1], lon: jetsObj[propName][2] },
+        // height should be sent too!
+      ) );
+      jetsOnly.push(jetsObj[propName]);
+    }
+  }
+  // 19th elements
 
+  // new variable is unnessesary
+  jetsOnly.sort((element1, element2) => {
+    return element1[18] - element2[18]
+  });
+  console.log(jetsOnly);
+
+  // so, jets array was sorted by compare function which was received as argument...
+  let html = '<span>Under construction...</span>';
+  /*
   let html = '<table><thead>';
   html += "<tr><th>Flight Number</th><th>Coordinates</th><th>Distance to Airport</th></tr>";
   html += '</thead>';
   html += '<tbody>';
-
+  */
+  /*
   for (jetNum in jetsArray) {
+    console.log(jetNum);
     html += "<tr>" +
       "<td>" + jetsArray[jetNum].flightNumber + "</td>" +
       "<td>" + jetsArray[jetNum].coordinates.lat + ", " + jetsArray[jetNum].coordinates.lon + "</td>" +
       "<td>" + jetsArray[jetNum].distanceToAirport.toFixed(2) + "</td>" +
     "</tr>";
   };
+  */
 
-  html += '</tbody></table>';
+  //html += '</tbody></table>';
   return html;
 }
