@@ -106,18 +106,12 @@ let getDistanceBetween2PointsOnSphere = (coordinatesObj1, coordinatesObj2, r=637
 function _getTableHTML(jetsObj) {
   /*
     TODO:
-    [ ] height should be sent as last arg to getDistanceBetween2PointsOnSphere ()
-      what is the height in original response?
-    [ ] coordinates: [1], [2]
-    [ ] speed, km/h
-      is received or need to calc?
-    [ ] vector, grad
-      wtf?
-    [ ] height, m
-    [ ] airport codes: [11], [12]
-      is correct?
-    [ ] flight number
-      what is the flight num in response?
+    [1, 2] coordinates
+    [3] vector, grad
+    [4] height, ft
+    [5] speed, kh
+    [11, 12] airport codes (from/to)
+    [13, 16] flight number
   */
   // need to sort jets by distance
   let airportCoordinates = { lat: 55.410307, lon: 37.902451 };
@@ -139,27 +133,33 @@ function _getTableHTML(jetsObj) {
   jetsOnly.sort((element1, element2) => {
     return element1[18] - element2[18]
   });
-  console.log(jetsOnly);
+  //console.log(jetsOnly);
 
   // so, jets array was sorted by compare function which was received as argument...
-  let html = '<span>Under construction...</span>';
-  /*
   let html = '<table><thead>';
-  html += "<tr><th>Flight Number</th><th>Coordinates</th><th>Distance to Airport</th></tr>";
+  html += "<tr><th>Coords</th><th>Speed, km/h</th><th>Vector, deg</th><th>Height, m</th><th>From - To</th><th>Flight number</th><th>Dist., km</th></tr>";
   html += '</thead>';
   html += '<tbody>';
-  */
   /*
-  for (jetNum in jetsArray) {
-    console.log(jetNum);
+    SO:
+    [1, 2] coordinates
+    [5] speed, kh= x1.852 km/h
+    [3] vector, grad (could be got val from 0 to 360)
+    [4] height, ft= x0.0003048 km= x0.3048 km
+    [11, 12] airport codes (from/to)
+    [13, 16] flight number
+  */
+  for (jetNum in jetsOnly) {
     html += "<tr>" +
-      "<td>" + jetsArray[jetNum].flightNumber + "</td>" +
-      "<td>" + jetsArray[jetNum].coordinates.lat + ", " + jetsArray[jetNum].coordinates.lon + "</td>" +
-      "<td>" + jetsArray[jetNum].distanceToAirport.toFixed(2) + "</td>" +
+      "<td>" + jetsOnly[jetNum][1] + ", " + jetsOnly[jetNum][2] + "</td>" +
+      "<td>" + (jetsOnly[jetNum][5]*1.852).toFixed(2) + "</td>" +
+      "<td>" + jetsOnly[jetNum][3] + "</td>" +
+      "<td>" + (jetsOnly[jetNum][4]*0.3048).toFixed(0) + "</td>" +
+      "<td>" + (String(jetsOnly[jetNum][11]) || 'empty_wtf?') + " - " + (jetsOnly[jetNum][12] || 'empty_wtf?') + "</td>" +
+      "<td>" + jetsOnly[jetNum][13] + " / " + jetsOnly[jetNum][16] + "</td>" +
+      "<td>" + jetsOnly[jetNum][18].toFixed(2) + "</td>" +
     "</tr>";
   };
-  */
-
-  //html += '</tbody></table>';
+  html += '</tbody></table>';
   return html;
 }
