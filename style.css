@@ -35,21 +35,26 @@ body { font-family: Sans-Serif; }
 
 table { width: 100% }
 
-/* RESULTTABLE */
-#resultTable {
+/* RESULT */
+#status, #resultTable {
   -webkit-transition: background .5s, color .5s ease-in-out;
   -moz-transition: background .5s, color .5s ease-in-out;
   -ms-transition: background .5s, color .5s ease-in-out;
   -o-transition: background .5s, color .5s ease-in-out;
   transition: background .5s, color .5s ease-in-out;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 5px;
 
   -webkit-box-shadow: 5px 5px 10px rgba(0, 0, 0, .8);
   -moz-box-shadow: 5px 5px 10px rgba(0, 0, 0, .8);
   -ms-box-shadow: 5px 5px 10px rgba(0, 0, 0, .8);
   -o-box-shadow: 5px 5px 10px rgba(0, 0, 0, .8);
   box-shadow: 5px 5px 10px rgba(0, 0, 0, .8);
+}
+
+#resultTable {
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 /* CHECKBOX AS SWITCHER */

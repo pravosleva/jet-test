@@ -1,8 +1,11 @@
 let _setCustomResult = (arg) => {
   let { msg, bgColor='#D1B37D', color='black' } = arg;
-  document.getElementById('resultTable').innerHTML = '<strong>' + msg + '</strong>';
-  document.getElementById('resultTable').style.background = bgColor;
-  document.getElementById('resultTable').style.color = color;
+  //document.getElementById('resultTable').innerHTML = '<strong>' + msg + '</strong>';
+  //document.getElementById('resultTable').style.background = bgColor;
+  //document.getElementById('resultTable').style.color = color;
+  document.getElementById('status').innerHTML = '<strong>' + msg + '</strong>';
+  document.getElementById('status').style.background = bgColor;
+  document.getElementById('status').style.color = color;
 };
 
 function onCheckBoxChange (checkBox) {
@@ -12,12 +15,16 @@ function onCheckBoxChange (checkBox) {
     document.getElementById('resultTable').style.background = '#69ADA4';//#748CB5
     document.getElementById('resultTable').style.color = 'white';
     document.getElementById('reportTime').innerHTML = new Date();
+    _setCustomResult({ msg: 'Received.', bgColor: '#69ADA4', color: 'white' });
   },
   callbackAsReject = (err) => {
     //console.error(err);
-    document.getElementById('resultTable').innerHTML = '<strong>Error: ' + (err || 'Trying to reconnect...') + '</strong>';
-    document.getElementById('resultTable').style.background = '#ee5f5b';
-    document.getElementById('resultTable').style.color = 'white';
+    //document.getElementById('resultTable').innerHTML = '<strong>Error: ' + (err || 'Trying to reconnect...') + '</strong>';
+    //document.getElementById('resultTable').style.background = '#ee5f5b';
+    //document.getElementById('resultTable').style.color = 'white';
+    document.getElementById('status').innerHTML = '<strong>Error: ' + (err || 'Trying to reconnect...') + '</strong>';
+    document.getElementById('status').style.background = '#ee5f5b';
+    document.getElementById('status').style.color = 'white';
   };
   if (checkBox.checked) {
     var switched_ON = true;
@@ -160,12 +167,12 @@ function _getTableHTML(jetsObj) {
   for (jetNum in jetsOnly) {
     html += "<tr>" +
       "<td>" + jetsOnly[jetNum][1] + ", " + jetsOnly[jetNum][2] + "</td>" +
-      "<td class='sm-hidden'>" + (jetsOnly[jetNum][5]*1.852).toFixed(2) + "</td>" +
+      "<td class='sm-hidden'>" + (jetsOnly[jetNum][5]*1.852).toFixed(0) + "</td>" +
       "<td class='sm-hidden'>" + jetsOnly[jetNum][3] + "</td>" +
       "<td class='sm-hidden'>" + (jetsOnly[jetNum][4]*0.3048).toFixed(0) + "</td>" +
-      "<td>" + (String(jetsOnly[jetNum][11]) || '?') + "-" + (jetsOnly[jetNum][12] || '?') + "</td>" +
-      "<td class='sm-hidden'>" + jetsOnly[jetNum][13] + " / " + jetsOnly[jetNum][16] + "</td>" +
-      "<td>" + jetsOnly[jetNum][18].toFixed(2) + "</td>" +
+      "<td>" + (String(jetsOnly[jetNum][11]) || 'N/A') + "-" + (jetsOnly[jetNum][12] || 'N/A') + "</td>" +
+      "<td class='sm-hidden'>" + (jetsOnly[jetNum][13] || 'N/A') + " / " + (jetsOnly[jetNum][16] || 'N/A') + "</td>" +
+      "<td>" + jetsOnly[jetNum][18].toFixed(0) + "</td>" +
     "</tr>";
   };
   html += '</tbody></table>';
