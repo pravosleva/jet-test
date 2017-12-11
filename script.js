@@ -136,8 +136,16 @@ function _getTableHTML(jetsObj) {
   //console.log(jetsOnly);
 
   // so, jets array was sorted by compare function which was received as argument...
-  let html = '<table><thead>';
-  html += "<tr><th>Coords</th><th>Speed, km/h</th><th>Vector, deg</th><th>Height, m</th><th>From - To</th><th>Flight number</th><th>Dist., km</th></tr>";
+  let html = "<table><thead>" +
+    "<tr>" +
+    "<th>Coords</th>" +
+    "<th class='sm-hidden'>Speed, km/h</th>" +
+    "<th class='sm-hidden'>Vector, deg</th>" +
+    "<th class='sm-hidden'>Height, m</th>" +
+    "<th>From-To</th>" +
+    "<th class='sm-hidden'>Flight number</th>" +
+    "<th>Dist., km</th>" +
+  "</tr>";
   html += '</thead>';
   html += '<tbody>';
   /*
@@ -152,11 +160,11 @@ function _getTableHTML(jetsObj) {
   for (jetNum in jetsOnly) {
     html += "<tr>" +
       "<td>" + jetsOnly[jetNum][1] + ", " + jetsOnly[jetNum][2] + "</td>" +
-      "<td>" + (jetsOnly[jetNum][5]*1.852).toFixed(2) + "</td>" +
-      "<td>" + jetsOnly[jetNum][3] + "</td>" +
-      "<td>" + (jetsOnly[jetNum][4]*0.3048).toFixed(0) + "</td>" +
-      "<td>" + (String(jetsOnly[jetNum][11]) || 'empty_wtf?') + " - " + (jetsOnly[jetNum][12] || 'empty_wtf?') + "</td>" +
-      "<td>" + jetsOnly[jetNum][13] + " / " + jetsOnly[jetNum][16] + "</td>" +
+      "<td class='sm-hidden'>" + (jetsOnly[jetNum][5]*1.852).toFixed(2) + "</td>" +
+      "<td class='sm-hidden'>" + jetsOnly[jetNum][3] + "</td>" +
+      "<td class='sm-hidden'>" + (jetsOnly[jetNum][4]*0.3048).toFixed(0) + "</td>" +
+      "<td>" + (String(jetsOnly[jetNum][11]) || '?') + "-" + (jetsOnly[jetNum][12] || '?') + "</td>" +
+      "<td class='sm-hidden'>" + jetsOnly[jetNum][13] + " / " + jetsOnly[jetNum][16] + "</td>" +
       "<td>" + jetsOnly[jetNum][18].toFixed(2) + "</td>" +
     "</tr>";
   };

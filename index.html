@@ -14,21 +14,19 @@
       <h1>Jets</h1>
     </div>
 
-    <div class="block-1">
-      <h2>Input</h2>
-      <p><pre>Default delay setting = 3000 ms.</pre></p>
-      <section>
-        <div class="slideThree">
-          <input type="checkbox" onchange="onCheckBoxChange(this)" id="slideThree" value="None" name="check" />
-          <label for="slideThree"></label>
-        </div>
-      </section>
+    <div class="block-switcher">
+      <div class="slideThree">
+        <input type="checkbox" onchange="onCheckBoxChange(this)" id="slideThree" value="None" name="check" />
+        <label for="slideThree"></label>
+      </div>
+    </div>
+
+    <div class='block-left'>
     </div>
 
     <div class="block-2">
-      <h2>Output</h2>
       <p>
-        <code>Last update: <span id='reportTime'></span></code>
+        <code>Default delay setting = 3000 ms.<br />Last update: <span id='reportTime'></span></code>
         <div id='resultTable'><em>Data was not received yet...</em></div>
       </p>
     </div>

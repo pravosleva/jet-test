@@ -1,25 +1,36 @@
 body { font-family: Sans-Serif; }
 .container {
   display: grid;
-  grid-template-columns: auto minmax(300px, 1000px) auto;
+  grid-template-columns: auto minmax(150px, 900px) 100px auto;
 }
 .block-0-header {
   grid-column-start: 2;
   grid-column-end: 3;
   grid-row-start: 1;
   grid-row-end: 2;
+  padding-left: 10px;
 }
-.block-1 {
-  grid-column-start: 2;
-  grid-column-end: 3;
+.block-left {
+  grid-column-start: 1;/*2*/
+  grid-column-end: 2;/*3*/
+  grid-row-start: 1;
+  grid-row-end: 2;
+
+  /*border:1px dotted lightgray;*/
+}
+.block-2 {
+  grid-column-start: 2;/*2*/
+  grid-column-end: 4;/*3*/
   grid-row-start: 2;
   grid-row-end: 3;
 }
-.block-2 {
-  grid-column-start: 2;
-  grid-column-end: 3;
-  grid-row-start: 3;
-  grid-row-end: 4;
+.block-switcher {
+  grid-column-start: 3;
+  grid-column-end: 4;
+  grid-row-start: 1;
+  grid-row-end: 2;
+
+  /*border:1px dotted lightgray;*/
 }
 
 table { width: 100% }
@@ -92,4 +103,8 @@ table { width: 100% }
 }
 .slideThree input[type="checkbox"]:checked + label {
   left: 43px;
+}
+
+@media screen and (max-width: 800px) {
+  .sm-hidden { display: none; }
 }
